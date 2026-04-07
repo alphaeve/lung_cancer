@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import joblib
+from pollution_api import get_pollution
 
 st.set_page_config(page_title="Lung Cancer Risk AI", layout="wide")
 
@@ -29,12 +30,20 @@ with col2:
     swallow = st.selectbox("Swallowing Difficulty", [0,1])
     chest_pain = st.selectbox("Chest Pain", [0,1])
 
+# ✅ GET REAL-TIME POLLUTION
+pm25 = get_pollution("Ahmedabad")
+st.info(f"Current PM2.5 Level: {pm25}")
+
+# ✅ IMPORTANT: Same feature order as training
 data = np.array([[gender, age, smoking, yellow_fingers, anxiety, peer_pressure,
                   chronic_disease, fatigue, allergy, wheezing, alcohol,
-                  coughing, breath, swallow, chest_pain]])
+                  coughing, breath, swallow, chest_pain, pm25]])
 
 if st.button("Predict Lung Cancer Risk"):
     pred = model.predict(data)[0]
+    prob = model.predict_proba(data)[0][1]
+
+    st.write(f"Risk Probability: {prob*100:.2f}%")
 
     if pred == 1:
         st.error("High Lung Cancer Risk")
@@ -44,6 +53,53 @@ if st.button("Predict Lung Cancer Risk"):
 st.markdown("---")
 st.subheader("Explainable AI")
 st.image("shap_feature_importance.png")
+
+# import streamlit as st
+# import numpy as np
+# import joblib
+
+# st.set_page_config(page_title="Lung Cancer Risk AI", layout="wide")
+
+# model = joblib.load("model.pkl")
+
+# st.title("AI System for Early Lung Cancer Risk Prediction")
+
+# col1, col2 = st.columns(2)
+
+# with col1:
+#     gender = st.selectbox("Gender", [0,1])  # 0=Female, 1=Male
+#     age = st.slider("Age", 20, 80, 40)
+#     smoking = st.selectbox("Smoking", [0,1])
+#     yellow_fingers = st.selectbox("Yellow Fingers", [0,1])
+#     anxiety = st.selectbox("Anxiety", [0,1])
+#     peer_pressure = st.selectbox("Peer Pressure", [0,1])
+#     chronic_disease = st.selectbox("Chronic Disease", [0,1])
+
+# with col2:
+#     fatigue = st.selectbox("Fatigue", [0,1])
+#     allergy = st.selectbox("Allergy", [0,1])
+#     wheezing = st.selectbox("Wheezing", [0,1])
+#     alcohol = st.selectbox("Alcohol Consuming", [0,1])
+#     coughing = st.selectbox("Coughing", [0,1])
+#     breath = st.selectbox("Shortness of Breath", [0,1])
+#     swallow = st.selectbox("Swallowing Difficulty", [0,1])
+#     chest_pain = st.selectbox("Chest Pain", [0,1])
+
+# data = np.array([[gender, age, smoking, yellow_fingers, anxiety, peer_pressure,
+#                   chronic_disease, fatigue, allergy, wheezing, alcohol,
+#                   coughing, breath, swallow, chest_pain]])
+
+# if st.button("Predict Lung Cancer Risk"):
+#     pred = model.predict(data)[0]
+
+#     if pred == 1:
+#         st.error("High Lung Cancer Risk")
+#     else:
+#         st.success("Low Lung Cancer Risk")
+
+# st.markdown("---")
+# st.subheader("Explainable AI")
+# st.image("shap_feature_importance.png")
 
 
 
