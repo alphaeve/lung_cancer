@@ -1,0 +1,4 @@
+pip install streamlit pandas numpy scikit-learn xgboost shap joblib requests imbalanced-learn matplotlib
+python train_model.py
+streamlit run app.py
+python -m streamlit run app.py
